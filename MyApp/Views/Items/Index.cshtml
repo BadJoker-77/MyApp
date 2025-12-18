@@ -1,0 +1,81 @@
+﻿@model MyApp.Models.PaginatedList<MyApp.Models.Item>
+
+@{
+    ViewData["Title"] = "Item Page";
+}
+
+<h3>Item Page</h3>
+
+<div class="d-flex justify-content-end">
+    <div class="d-grid col-2">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='@Url.Action("Create", "Items")'">Add Item</button>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Serial Number</th>
+            <th>Category</th>
+            <th>Clients</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr @(item.ID == (int?)ViewData["LastInsertedItemId"] ? "class='table-success'" : "")>
+                <td>@item.Name</td>
+                <td>@item.Price.ToString("N2")$</td>
+                <td>@item.SerialNumber?.Name</td>
+                <td>@item.Category?.Name</td>
+                <td>
+                    @foreach (var client in item.ItemClients)
+                    {
+                        @client.Client.Name
+                    }
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <div class="d-grid col-5 mx-auto">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='@Url.Action("Edit", "Items", new { id = item.ID })'">Edit</button>
+                        </div>
+                        <div class="d-grid col-5 mx-auto">
+                            <button type="button" class="btn btn-danger" onclick="window.location.href='@Url.Action("Delete", "Items", new { id = item.ID })'" onsubmit="return confirm('Are you sure you want to delete this item?');">Delete</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination Controls -->
+<div class="d-flex justify-content-center">
+    <div class="pagination">
+        <ul class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, pageSize = Model.PageSize })">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = Model.PageSize })">@i</a>
+                </li>
+            }
+
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, pageSize = Model.PageSize })">Next</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
